@@ -26,52 +26,60 @@ if [ -z "$GM_DIR" ]; then
 fi
 echo -e "==> Using '$GM_DIR' as the gitminer checkout location.\n"
 
-if [ -z "$GH_TOKEN" ]; then
-  until [ -n "$GH_TOKEN" ]; do
-    echo -e "==> What is your github.com auth token?"
-    read GH_TOKEN
-  done
+if [ -f "$GM_DIR/m801-config.properties" ]; then
+  echo -e "==> $GM_DIR/m801-config.properties already exists. Overwrite? [no]"
+  read OVERWRITE_CONFIG
+else
+  OVERWRITE_CONFIG=yes
 fi
-echo -e "==> Setting '$GH_TOKEN' as your github.com auth token.\n"
 
-if [ -z "$GH_EMAIL" ]; then
-  until [ -n "$GH_EMAIL" ]; do
-    echo -e "==> What is your github.com email address?"
-    read GH_EMAIL
-  done
-fi
-echo -e "==> Setting '$GH_EMAIL' as your github.com email address.\n"
+if [[ $OVERWRITE_CONFIG =~ $(echo "(true|yes|1|on)") ]]; then
+  if [ -z "$GH_TOKEN" ]; then
+    until [ -n "$GH_TOKEN" ]; do
+      echo -e "==> What is your github.com auth token?"
+      read GH_TOKEN
+    done
+  fi
+  echo -e "==> Setting '$GH_TOKEN' as your github.com auth token.\n"
 
-if [ -z "$GH_RATELIMIT" ]; then
-  echo -e "==> What is your hourly github.com API rate limit (see http://developer.github.com/v3/#rate-limiting)? [12000]"
-  read GH_RATELIMIT
+  if [ -z "$GH_EMAIL" ]; then
+    until [ -n "$GH_EMAIL" ]; do
+      echo -e "==> What is your github.com email address?"
+      read GH_EMAIL
+    done
+  fi
+  echo -e "==> Setting '$GH_EMAIL' as your github.com email address.\n"
+
   if [ -z "$GH_RATELIMIT" ]; then
-    GH_RATELIMIT="12000"
+    echo -e "==> What is your hourly github.com API rate limit (see http://developer.github.com/v3/#rate-limiting)? [12000]"
+    read GH_RATELIMIT
+    if [ -z "$GH_RATELIMIT" ]; then
+      GH_RATELIMIT="12000"
+    fi
   fi
-fi
-echo -e "==> Setting '$GH_RATELIMIT' as your hourly github.com API rate limit.\n"
+  echo -e "==> Setting '$GH_RATELIMIT' as your hourly github.com API rate limit.\n"
 
-if [ -z "$REPOS" ]; then
-  echo -e "==> What repositories are you interested in (user/repo; comma-separated)? [diaspora/diaspora,discourse/discourse,gitlabhq/gitlabhq,jekyll/jekyll,mitchellh/vagrant,plataformatec/devise,publify/publify,rails/rails,thoughtbot/paperclip]"
-  read REPOS
   if [ -z "$REPOS" ]; then
-    REPOS="diaspora/diaspora,discourse/discourse,gitlabhq/gitlabhq,jekyll/jekyll,mitchellh/vagrant,plataformatec/devise,publify/publify,rails/rails,thoughtbot/paperclip"
+    echo -e "==> What repositories are you interested in (user/repo; comma-separated)? [diaspora/diaspora,discourse/discourse,gitlabhq/gitlabhq,jekyll/jekyll,mitchellh/vagrant,plataformatec/devise,publify/publify,rails/rails,thoughtbot/paperclip]"
+    read REPOS
+    if [ -z "$REPOS" ]; then
+      REPOS="diaspora/diaspora,discourse/discourse,gitlabhq/gitlabhq,jekyll/jekyll,mitchellh/vagrant,plataformatec/devise,publify/publify,rails/rails,thoughtbot/paperclip"
+    fi
   fi
-fi
-echo -e "==> Pulling '$REPOS' repositories.\n"
+  echo -e "==> Pulling '$REPOS' repositories.\n"
 
-if [ -z "$GM_MEMORY" ]; then
-  echo -e "==> How many GB of memory can you dedicate to this task? [15]"
-  read GM_MEMORY
   if [ -z "$GM_MEMORY" ]; then
-    GM_MEMORY="15"
+    echo -e "==> How many GB of memory can you dedicate to this task? [15]"
+    read GM_MEMORY
+    if [ -z "$GM_MEMORY" ]; then
+      GM_MEMORY="15"
+    fi
   fi
-fi
-echo -e "==> Using up to '$GM_MEMORY'GB memory.\n"
+  echo -e "==> Using up to '$GM_MEMORY'GB memory.\n"
 
-echo -e "==> Writing config to $GM_DIR/m801-config.properties\n"
-(
-cat <<EOS
+  echo -e "==> Writing config to $GM_DIR/m801-config.properties.\n"
+  (
+  cat <<EOS
 net.wagstrom.research.github.token=$GH_TOKEN
 net.wagstrom.research.github.email=$GH_EMAIL
 
@@ -95,7 +103,10 @@ edu.unl.cse.git.dburl=m801.db
 edu.unl.cse.git.repositories=$REPOS
 edu.unl.cse.git.repositories.removeAfterLoad=false
 EOS
-) > $GM_DIR/m801-config.properties
+  ) > $GM_DIR/m801-config.properties
+else
+   echo -e "==> Using existing $GM_DIR/m801-config.properties.\n"
+fi
 
 cd $GM_DIR
 
