@@ -18,10 +18,10 @@
 WORKDIR=`pwd`
 
 if [ -z "$GM_DIR" ]; then
-  echo -e "==> Where is your gitminer checkout located? [../gitminer]"
+  echo -e "==> Where is your gitminer checkout located? [./gitminer]"
   read GM_DIR
   if [ -z "$GM_DIR" ]; then
-    GM_DIR="../gitminer"
+    GM_DIR="./gitminer"
   fi
 fi
 echo -e "==> Using '$GM_DIR' as the gitminer checkout location.\n"
