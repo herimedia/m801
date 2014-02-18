@@ -41,6 +41,9 @@ find . -maxdepth 1 -mindepth 1 -type d | sort | while read repo; do
   rvm gemset create $repo
   rvm use 2.0.0@$repo
 
+  # Make sure we have an up-to-date bundler
+  gem install bundler
+
   # Install gem dependencies.
   bundle
 
