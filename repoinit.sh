@@ -16,6 +16,9 @@ fi
 cd ./repositories
 
 find . -maxdepth 1 -mindepth 1 -type d | sort | while read repo; do
+  IFS='/' read -ra repo <<< "$repo"
+  repo=${repo[@]:(-1)}
+
   echo -e "\n==> Initializing '$repo'?\n"
 
   cd $repo
