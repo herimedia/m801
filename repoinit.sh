@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash --login
 
 # Creates gemsets for all repositories in ./repositories and
 # installs their dependencies using bundler.
