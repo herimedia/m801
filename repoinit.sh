@@ -31,8 +31,7 @@ find . -maxdepth 1 -mindepth 1 -type d | sort | while read repo; do
   esac
 
   # Add simplecov gem to requirements if not already present
-  grep "gem\W+simplecov" Gemfile
-  if [ ! $? ]; then
+  if ! egrep "gem\W+simplecov" Gemfile; then
     echo "gem 'simplecov', :require => false" >> Gemfile
   fi
 
